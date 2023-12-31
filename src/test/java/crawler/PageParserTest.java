@@ -11,7 +11,7 @@ public class PageParserTest {
     @Test
     public void shouldAnswerWithTrue()
     {
-        PageParser parser = new PageParser();
+        LinkExtractor parser = new LinkExtractor();
         String html = "<a href=\"/wiki/Java_(programming_language)\" title=\"Java (programming language)\">Java</a>";
         assertTrue(parser.parseHtml(html).get(0).equals("/wiki/Java_(programming_language)"));
     }

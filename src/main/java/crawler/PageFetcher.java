@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
+import java.net.http.HttpHeaders;
 import java.net.http.HttpClient.Redirect;
 import java.net.http.HttpClient.Version;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 public class PageFetcher {
     private HttpClient client;
@@ -30,7 +32,7 @@ public class PageFetcher {
             HttpResponse<String> response = this.client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 429) {
                 System.out.println("Rate limit exceeded, retrying after: " + response.headers().firstValue("Retry-After").get());
-                Thread.sleep(Integer.parseInt(response.headers().firstValue("Retry-After").get()) * 1000);
+                Thread.sleep(this.getSleepDuration(response.headers()));
                 response = this.client.send(request, HttpResponse.BodyHandlers.ofString());
             }
             if (response.statusCode() != 200) {
@@ -60,5 +62,15 @@ public class PageFetcher {
             .GET()
             .build();
         return request;
+    }
+
+    private long getSleepDuration(HttpHeaders headers) {
+        return TimeUnit
+            .SECONDS
+            .toMillis(
+                Integer.parseInt(
+                    headers.firstValue("Retry-After").get()
+                )
+            );
     }
 }
