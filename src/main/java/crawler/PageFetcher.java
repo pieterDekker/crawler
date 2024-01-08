@@ -12,6 +12,8 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
+import crawler.entities.Page;
+
 public class PageFetcher {
     private HttpClient client;
     public PageFetcher() {
@@ -22,10 +24,11 @@ public class PageFetcher {
             .build();
     }
 
-    public String getPage(String location) {
-        HttpRequest request = this.BuildRequest(location);
+    public Page getPage(String location) {
+        HttpRequest request = this.buildRequest(location);
         if (request == null) {
-            return "";
+            System.out.println("Error: request is null");
+            return new Page(null, "");
         }
 
         try {
@@ -37,19 +40,19 @@ public class PageFetcher {
             }
             if (response.statusCode() != 200) {
                 System.out.println("Error: " + response.statusCode());
-                return "";
+                return new Page(null, "");
             }
-            return response.body();
+            return new Page(response.uri(), response.body());
         } catch (IOException e) {
             System.out.println("IO error: " + e);
-            return "";
+            return new Page(null, "");
         } catch (InterruptedException e) {
             System.out.println("Interrupted error: " + e);
-            return "";
+            return new Page(null, "");
         }
     }
 
-    private HttpRequest BuildRequest(String location) {
+    private HttpRequest buildRequest(String location) {
         URI uri;
         try {
             uri = new URI(location);
