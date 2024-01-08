@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.time.StopWatch;
+
 import crawler.entities.Link;
 import crawler.entities.Page;
 
@@ -26,15 +28,17 @@ public class Crawler {
         this.wc = new WordCounter();
     }
 
-    public void crawl(int MAX_DEPTH, int MAX_SECONDS, String seedUrl) {
-        long t = System.currentTimeMillis();
+    public void crawl(int maxDepth, int maxSeconds, String seedUrl) {
+        StopWatch sw = new StopWatch();
+        sw.start();
 
         queue.add(new Link(seedUrl, 0));
         visited.add(seedUrl);
+
         Link link;
         while ((link = queue.poll()) != null) {
-            if ((System.currentTimeMillis() - t )> TimeUnit.SECONDS.toMillis(MAX_SECONDS)) {
-                System.out.println("1 minute elapsed");
+            if (sw.getTime(TimeUnit.SECONDS) > maxSeconds) {
+                System.out.println("max time elapsed");
                 break;
             }
             Page page = fetcher.getPage(link.location());
