@@ -73,14 +73,11 @@ public class Crawler {
         String topWord = "";
         int topCount = 0;
         for (Map.Entry<String, Integer> e: wordCounts.entrySet()) {
-            if (e.getValue() > 100) {
-                System.out.println(e.getKey() + " " + e.getValue());
-            }
             if (e.getValue() > topCount) {
                 topCount = e.getValue();
                 topWord = e.getKey();
             }
         }
-        System.out.println("top word: " + topWord + " with " + topCount + " occurrences");
+        System.out.println("top word: '" + topWord + "' with " + topCount + " occurrences");
     }
 }
