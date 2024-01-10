@@ -13,14 +13,14 @@ import org.apache.commons.lang3.time.StopWatch;
 import crawler.entities.Link;
 import crawler.entities.Page;
 
-public class Crawler {
+public class SingleThreadedCrawler implements CrawlerInterface {
     private PageFetcher fetcher;
     private Set<String> visited;
     private LinkedBlockingQueue<Link> queue;
     private HashMap<String, Integer> wordCounts;
     private WordCounter wc;
 
-    public Crawler() {
+    public SingleThreadedCrawler() {
         this.fetcher = new PageFetcher();
         this.visited = new HashSet<String>();
         this.queue = new LinkedBlockingQueue<Link>();
@@ -38,7 +38,6 @@ public class Crawler {
         Link link;
         while ((link = queue.poll()) != null) {
             if (sw.getTime(TimeUnit.SECONDS) > maxSeconds) {
-                System.out.println("max time elapsed");
                 break;
             }
             Page page = fetcher.getPage(link.location());
@@ -78,6 +77,6 @@ public class Crawler {
                 topWord = e.getKey();
             }
         }
-        System.out.println("top word: '" + topWord + "' with " + topCount + " occurrences");
+        System.out.println("Top term: '" + topWord + "' with count " + topCount);
     }
 }

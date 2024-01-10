@@ -1,9 +1,11 @@
 package crawler;
 
+import java.util.ArrayList;
+
 public class App {
     public static void main(String[] args) {
-        if (args.length != 3) {
-            System.out.println("Usage: java -jar crawler.jar <seed-url> <max-depth> <max-seconds>");
+        if (args.length != 4) {
+            System.out.println("Usage: java -jar crawler.jar <seed-url> <max-depth> <max-seconds> <crawler-type>");
             System.exit(1);
         }
 
@@ -23,7 +25,20 @@ public class App {
             System.out.println("max-seconds must be an integer");
             System.exit(1);
         }
+        ArrayList<String> crawlerTypes = new ArrayList<String>();
+        crawlerTypes.add("single-threaded");
+        crawlerTypes.add("multi-threaded");
+        if (!crawlerTypes.contains(args[3])) {
+            System.out.println("crawler-type must be one of: single-threaded, multi-threaded");
+            System.exit(1);
+        }
 
-        new Crawler().crawl(maxDepth, maxSeconds, seedUrl);
+        switch (args[3]) {
+            case "single-threaded":
+                new SingleThreadedCrawler().crawl(maxDepth, maxSeconds, seedUrl);
+                break;
+            case "multi-threaded":
+                new MultiThreadedCrawler().crawl(maxDepth, maxSeconds, seedUrl);
+        }
     }
 }
