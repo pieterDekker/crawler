@@ -15,7 +15,7 @@ public class UriExtractorTest {
         UriExtractor parser = new UriExtractor();
         String html = "<a href=\"/wiki/Java_(programming_language)\" title=\"Java (programming language)\">Java</a>";
         URI location = URI.create("https://en.wikipedia.org/wiki/Java");
-        Page page = new Page(location, html);
+        Page page = new Page(location, html, 0);
         assertTrue(parser.processPage(page).get(0).equals("https://en.wikipedia.org/wiki/Java_(programming_language)"));
     }
 
@@ -25,7 +25,7 @@ public class UriExtractorTest {
         UriExtractor parser = new UriExtractor();
         String html = "<a href=\"#local-element\">Local Element</a>";
         URI location = URI.create("https://en.wikipedia.org/wiki/Java");
-        Page page = new Page(location, html);
+        Page page = new Page(location, html, 0);
         assertTrue(parser.processPage(page).isEmpty());
     }
 }

@@ -9,6 +9,8 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.core.StopAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 
+import crawler.entities.Page;
+
 public class WordCounter {
     private StopAnalyzer analyzer;
 
@@ -33,8 +35,8 @@ public class WordCounter {
      * @param docText
      * @return
      */
-    public HashMap<String, Integer> countWords(String docText) {
-        TokenStream ts = this.analyzer.tokenStream("text", docText);
+    public HashMap<String, Integer> countWords(Page docText) {
+        TokenStream ts = this.analyzer.tokenStream("text", docText.html());
         CharTermAttribute charTermAtt = ts.addAttribute(CharTermAttribute.class);
 
         HashMap<String, Integer> wordCounts = new HashMap<String, Integer>();

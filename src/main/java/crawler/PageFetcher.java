@@ -12,6 +12,7 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
+import crawler.entities.Link;
 import crawler.entities.Page;
 
 public class PageFetcher {
@@ -24,38 +25,39 @@ public class PageFetcher {
             .build();
     }
 
-    public Page getPage(String location) {
-        HttpRequest request = this.buildRequest(location);
+    public Page getPage(Link link) {
+        HttpRequest request = this.buildRequest(link);
         if (request == null) {
             System.out.println("Error: request is null");
-            return new Page(null, "");
+            return new Page(null, "", -1);
         }
 
         try {
             HttpResponse<String> response = this.client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 429) {
+                // TODO: make this thread safe with a request token service
                 System.out.println("Rate limit exceeded, retrying after: " + response.headers().firstValue("Retry-After").get());
                 Thread.sleep(this.getSleepDuration(response.headers()));
                 response = this.client.send(request, HttpResponse.BodyHandlers.ofString());
             }
             if (response.statusCode() != 200) {
                 System.out.println("Error: " + response.statusCode());
-                return new Page(null, "");
+                return new Page(null, "", -1);
             }
-            return new Page(response.uri(), response.body());
+            return new Page(response.uri(), response.body(), link.depth());
         } catch (IOException e) {
             System.out.println("IO error: " + e);
-            return new Page(null, "");
+            return new Page(null, "", -1);
         } catch (InterruptedException e) {
-            System.out.println("Interrupted error: " + e);
-            return new Page(null, "");
+            System.out.println("Page fetching Interrupted: " + e);
+            return new Page(null, "", -1);
         }
     }
 
-    private HttpRequest buildRequest(String location) {
+    private HttpRequest buildRequest(Link link) {
         URI uri;
         try {
-            uri = new URI(location);
+            uri = new URI(link.location());
         } catch (URISyntaxException e) {
             System.out.println("URI error: " + e);
             return null;
@@ -75,5 +77,9 @@ public class PageFetcher {
                     headers.firstValue("Retry-After").get()
                 )
             );
+    }
+
+    public void close() {
+        this.client.close();
     }
 }

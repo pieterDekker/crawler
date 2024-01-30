@@ -40,7 +40,7 @@ public class SingleThreadedCrawler implements CrawlerInterface {
             if (sw.getTime(TimeUnit.SECONDS) > maxSeconds) {
                 break;
             }
-            Page page = fetcher.getPage(link.location());
+            Page page = fetcher.getPage(link);
             countWords(page);
             if (link.depth() < maxDepth) {
                 insertNewUrls(page, queue, visited, link.depth());
@@ -51,15 +51,14 @@ public class SingleThreadedCrawler implements CrawlerInterface {
     }
 
     private void countWords(Page page) {
-        for (Map.Entry<String, Integer> e: wc.countWords(page.html()).entrySet()) {
+        for (Map.Entry<String, Integer> e: wc.countWords(page).entrySet()) {
             wordCounts.put(e.getKey(), wordCounts.getOrDefault(e.getKey(),  0) + e.getValue());
         }
     }
 
     private void insertNewUrls(Page page, LinkedBlockingQueue<Link> queue, Set<String> visited, int currentDepth) {
-        ArrayList<String> newUris = new UriExtractor().processPage(page);
-        for (String newUri : newUris) {
-            Link newLink = new Link(newUri, currentDepth + 1);
+        ArrayList<Link> newLinks = new UriExtractor().processPage(page);
+        for (Link newLink : newLinks) {
             if (visited.contains(newLink.location())) {
                 continue;
             }
